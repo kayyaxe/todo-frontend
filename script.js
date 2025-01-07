@@ -25,6 +25,9 @@ async function getTasks() {
 
         const tasks = await response.json();
 
+        console.log(tasks);
+        
+
 
         // Clear the current list (in case you want to refresh the tasks)
         taskList.innerHTML = '';
@@ -33,6 +36,13 @@ async function getTasks() {
         tasks.forEach(task => {
             const li = document.createElement('li');
             li.textContent = task.title;
+            li.setAttribute('task-id',task.id); 
+            // Delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => deleteTask(li.getAttribute('task-id'),li));
+            li.append(deleteButton);
+
             taskList.appendChild(li);
         });
 
@@ -68,7 +78,15 @@ addTaskButton.addEventListener('click', async () => {
 
             // Add task to the frontend list
             const li = document.createElement('li');
+            li.setAttribute('task-id',addedTask.id);
             li.textContent = addedTask.title;
+            
+            // Delete button
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = 'Delete';
+            deleteButton.addEventListener('click', () => deleteTask(li.getAttribute('task-id'),li));
+            li.append(deleteButton);
+
             taskList.appendChild(li);
 
             taskInput.value = ''; // Clear the input
@@ -77,3 +95,21 @@ addTaskButton.addEventListener('click', async () => {
         }
     }
 });
+
+async function deleteTask(taskId, li) {
+    
+    try {
+        // Make DELETE request to backend
+        const response = await fetch(`${API_URL}/${taskId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+        li.remove();
+    }
+
+    catch (error) {
+        console.error('Error deleting  task:', error);
+    }
+}
