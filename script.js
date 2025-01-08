@@ -119,10 +119,46 @@ async function editTask(taskId, li) {
     }
 }
 
+function toggleTaskCompletion(checkbox, taskId, li) {
+    const isCompleted = checkbox.checked;
+
+    // Update the task title style
+    li.querySelector('.task-title').style.textDecoration = isCompleted ? 'line-through' : 'none';
+
+    // Optionally send an update to the backend for completion state
+    const updatedTask = { title: li.querySelector('.task-title').textContent.trim(), completed: isCompleted };
+    fetch(`${API_URL}/${taskId}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updatedTask),
+    }).catch(error => console.error('Error updating task completion:', error));
+}
+
 function createTaskElement(task) {
     const li = document.createElement('li');
-    li.textContent = task.title;
     li.setAttribute('task-id', task.id);
+
+     // Checkbox for task completion
+     const checkbox = document.createElement('input');
+     checkbox.type = 'checkbox';
+     checkbox.checked = task.completed;
+     checkbox.addEventListener('change', () => toggleTaskCompletion(checkbox, task.id, li));
+     li.appendChild(checkbox);
+
+    // Task title
+    const span = document.createElement('span');
+    span.textContent = task.title;
+    span.className = 'task-title';
+    span.style.textDecoration = task.completed ? 'line-through' : 'none';
+    li.appendChild(span);
+
+    // Edit button
+    const editButton = document.createElement('button');
+    editButton.innerHTML = '✏️'; // Pencil emoji
+    editButton.addEventListener('click', () => editTask(task.id, li));
+    li.append(editButton);
 
     // Delete button
     const deleteButton = document.createElement('button');
@@ -130,11 +166,7 @@ function createTaskElement(task) {
     deleteButton.addEventListener('click', () => deleteTask(task.id, li));
     li.append(deleteButton);
 
-    // Edit button
-    const editButton = document.createElement('button');
-    editButton.innerHTML = '✏️'; // Pencil emoji
-    editButton.addEventListener('click', () => editTask(task.id, li));
-    li.append(editButton);
+    
 
     return li;
 }
