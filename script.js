@@ -113,7 +113,7 @@ async function editTask(taskId, li) {
             throw new Error('Failed to update task');
         }
 
-        li.firstChild.textContent = updatedTitle.trim(); // Update the task title in the frontend
+        li.querySelector('.task-title').textContent = updatedTitle.trim(); // Update the task title in the frontend
     } catch (error) {
         console.error('Error updating task:', error);
     }
