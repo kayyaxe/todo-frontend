@@ -1,14 +1,91 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Georgia', serif;
+    background-color: #ffe6f2; /* Light pink background */
+    color: #5e3a3a; /* Soft brown for text */
     margin: 0;
     padding: 0;
 }
+
 #app {
     max-width: 600px;
     margin: 50px auto;
     padding: 20px;
     background: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px; /* Slightly more rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2); /* Softer shadow for elegance */
+    border: 2px solid #ffd1dc; /* Soft pink border */
 }
+
+#taskInput {
+    width: calc(100% - 20px);
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ffd1dc;
+    font-size: 16px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#addTaskButton {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #ffb3c1; /* Soft pink button */
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+#addTaskButton:hover {
+    background-color: #ff94a9; /* Slightly darker pink on hover */
+}
+
+#taskList {
+    list-style: none;
+    padding: 0;
+}
+
+#taskList li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #fff0f5; /* Very light pink for task background */
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+#taskList li .task-text {
+    flex-grow: 1;
+    font-size: 16px;
+    color: #5e3a3a;
+}
+
+#taskList li .button-group {
+    display: flex; /* Aligns the buttons horizontally */
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px; /* Adds more space between buttons */
+}
+
+#taskList li button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #ff80a0; /* Pink icons */
+}
+
+#taskList li button:hover {
+    color: #ff4d79; /* Darker pink for hover effect */
+}
+
+#taskList li button:focus {
+    outline: none;
+}
+

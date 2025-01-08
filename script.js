@@ -7,9 +7,8 @@ const taskList = document.getElementById('taskList');
 getTasks();
 
 async function getTasks() {
-    
     try {
-        // Make POST request to backend
+        // Make GET request to backend
         const response = await fetch(API_URL, {
             method: 'GET',
             headers: {
@@ -17,45 +16,30 @@ async function getTasks() {
             },
         });
 
-
-
         if (!response.ok) {
-            throw new Error('Failed to add task');
+            throw new Error('Failed to fetch tasks');
         }
 
         const tasks = await response.json();
 
         console.log(tasks);
-        
 
-
-        // Clear the current list (in case you want to refresh the tasks)
+        // Clear the current list
         taskList.innerHTML = '';
 
         // Create list items for each task
         tasks.forEach(task => {
-            const li = document.createElement('li');
-            li.textContent = task.title;
-            li.setAttribute('task-id',task.id); 
-            // Delete button
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', () => deleteTask(li.getAttribute('task-id'),li));
-            li.append(deleteButton);
-
+            const li = createTaskElement(task);
             taskList.appendChild(li);
         });
-
     } catch (error) {
-        console.error('Error adding task:', error);
+        console.error('Error fetching tasks:', error);
     }
 }
-
 
 addTaskButton.addEventListener('click', async () => {
     const taskText = taskInput.value.trim();
     if (taskText) {
-        // Create task object
         const newTask = { title: taskText, completed: false };
 
         try {
@@ -68,8 +52,6 @@ addTaskButton.addEventListener('click', async () => {
                 body: JSON.stringify(newTask),
             });
 
-            console.log(response);
-
             if (!response.ok) {
                 throw new Error('Failed to add task');
             }
@@ -77,16 +59,7 @@ addTaskButton.addEventListener('click', async () => {
             const addedTask = await response.json();
 
             // Add task to the frontend list
-            const li = document.createElement('li');
-            li.setAttribute('task-id',addedTask.id);
-            li.textContent = addedTask.title;
-            
-            // Delete button
-            const deleteButton = document.createElement('button');
-            deleteButton.textContent = 'Delete';
-            deleteButton.addEventListener('click', () => deleteTask(li.getAttribute('task-id'),li));
-            li.append(deleteButton);
-
+            const li = createTaskElement(addedTask);
             taskList.appendChild(li);
 
             taskInput.value = ''; // Clear the input
@@ -97,7 +70,6 @@ addTaskButton.addEventListener('click', async () => {
 });
 
 async function deleteTask(taskId, li) {
-    
     try {
         // Make DELETE request to backend
         const response = await fetch(`${API_URL}/${taskId}`, {
@@ -106,10 +78,63 @@ async function deleteTask(taskId, li) {
                 'Content-Type': 'application/json',
             },
         });
-        li.remove();
+
+        if (!response.ok) {
+            throw new Error('Failed to delete task');
+        }
+
+        li.remove(); // Remove task from the frontend list
+    } catch (error) {
+        console.error('Error deleting task:', error);
+    }
+}
+
+async function editTask(taskId, li) {
+    const currentTitle = li.firstChild.textContent.trim();
+    const updatedTitle = prompt("Edit Task Title:", currentTitle);
+
+    if (updatedTitle === null || updatedTitle.trim() === "") {
+        return; // Do nothing if user cancels or enters an empty string
     }
 
-    catch (error) {
-        console.error('Error deleting  task:', error);
+    try {
+        const updatedTask = { title: updatedTitle.trim(), completed: false };
+
+        // Make PUT request to backend
+        const response = await fetch(`${API_URL}/${taskId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(updatedTask),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to update task');
+        }
+
+        li.firstChild.textContent = updatedTitle.trim(); // Update the task title in the frontend
+    } catch (error) {
+        console.error('Error updating task:', error);
     }
+}
+
+function createTaskElement(task) {
+    const li = document.createElement('li');
+    li.textContent = task.title;
+    li.setAttribute('task-id', task.id);
+
+    // Delete button
+    const deleteButton = document.createElement('button');
+    deleteButton.innerHTML = '🗑️'; // Trash can emoji
+    deleteButton.addEventListener('click', () => deleteTask(task.id, li));
+    li.append(deleteButton);
+
+    // Edit button
+    const editButton = document.createElement('button');
+    editButton.innerHTML = '✏️'; // Pencil emoji
+    editButton.addEventListener('click', () => editTask(task.id, li));
+    li.append(editButton);
+
+    return li;
 }
